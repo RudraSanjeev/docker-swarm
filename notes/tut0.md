@@ -273,4 +273,115 @@ docker service create --help | grep limit
 ```
 
 - for ex- if you have to create a container which can take only 300 mb memory then use limit
-- and limit or reserve cpu use reserve and limit accordingly.
+- and same for the reason of reserve.
+
+#### docker service update:
+
+- update-delay
+- update-failure
+- update-order
+- upadate-parallelism
+
+```bash
+docker service create --help | grep update
+
+```
+
+#### docker secret
+
+```bash
+docker secret create dbpass -
+# enter your secret
+docker secret ls
+
+```
+
+- now when create a service we can pass secret name as --secret
+- only those container who is associated with the service can access to the secret.
+- you can access these password at /run/secret folder inside container
+
+```bash
+docker exec -it <container_id> sh
+cd /run/secret
+dbpass
+
+```
+
+- similarly you can create secret for api's and service and use them where you need inside container
+
+#### overlay-network:
+
+- this set the connection among all the node in the cluster
+- overlay encription doesn't support window machine
+
+#### Ingress-network:
+
+- thisis type of overlay-network in which has inbuid load-balancers
+- it distribute the load among all the n-containers
+  ![Ingress-network](./assets/ingress-network.png)
+
+#### Network Practical:
+
+1. Overlay network:
+
+```bash
+docker network create -d overlay test-network
+```
+
+- Now during new service creattion we can pass this network
+
+```bash
+docker service create -d --replicas=3 --network=test-network nginx
+
+```
+
+- now you can verify it using `docker network ls` cmd to every node worker who have been assigned to this task
+
+**Note**:
+
+- if we try to build and run a image from worker1 or 2 at test-network **we can't**
+- for that we need to create a overlay network which is attachable like this
+
+```bash
+
+docker network create -d overlay --attachable test-network2
+```
+
+- now if you pass this network in worker1 or 2 to run any image **you can**
+- and you can verify that both worker1 or worker2 which use same network will share same subnetting i.e. only last network bit will change and both have same network can ping to one-another
+
+#### Docker stack:
+
+- as we do define yml compose file and list all the services to run on a single container **But** this don't work with the docker-swarm with multiple container
+- Here we can use **docker stack**
+
+- cmd to deploy a commpose on cluster
+
+```bash
+# create
+docker stack deploy -c docker-compose.yml <stack_name>
+
+# list
+docker stack ls
+
+
+# print
+docker stack ps <stack_name>
+
+# list out all service of stack
+docker stack services <stack_name>
+
+# remove
+docker stack rm <stack_name>
+
+```
+
+#### docker events:
+
+```bash
+docker events # - in manager logs all events about services
+docker events # - in worker logs all about task - container created, volumes, etc.
+
+
+docker events --filter 'event=create'
+```
