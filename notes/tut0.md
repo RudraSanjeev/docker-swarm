@@ -52,7 +52,7 @@ docker swarm init
 - insure port 2377 is accepting in inbound rule of instance
 
 ```bash
-docker swarm join --token SWMTKN-1-5jxg5utk8b6u0p488grp6z2ypr1w5bwzkjk72ek8xf4b7m8j0a-8qh89acb83ytd49uxr4l2kzeq 172.31.85.69:2377
+docker swarm join --token <MANAGER_TOKEN>
 ```
 
 - you will get messages like
